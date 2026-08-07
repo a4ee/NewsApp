@@ -1,4 +1,4 @@
-package ru.pozdnyakov.news.ui.theme
+package ru.pozdnyakov.news.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
