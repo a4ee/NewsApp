@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,18 +10,32 @@ plugins {
 
 }
 
+
+
 android {
     namespace = "ru.pozdnyakov.news"
     compileSdk = 36
 
+    val localProperties = Properties()
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { inputStream ->
+            localProperties.load(inputStream)
+
+        }
+    }
+
+    val apiKey = localProperties.getProperty("API_KEY") ?: ""
+
     defaultConfig {
         applicationId = "ru.pozdnyakov.news"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {
@@ -40,6 +56,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

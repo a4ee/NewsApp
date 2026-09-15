@@ -2,6 +2,7 @@ package ru.pozdnyakov.news.di
 
 import android.content.Context
 import androidx.room.Room
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,9 +15,12 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.create
+import ru.pozdnyakov.news.BuildConfig
 import ru.pozdnyakov.news.data.local.NewsDao
 import ru.pozdnyakov.news.data.local.NewsDb
 import ru.pozdnyakov.news.data.remote.NewsApiService
+import ru.pozdnyakov.news.data.repository.NewsRepositoryImpl
+import ru.pozdnyakov.news.domain.repository.NewsRepository
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -24,7 +28,15 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 interface DataModule {
 
+    @Binds
+    @Singleton
+    fun bindNewsRepository(
+        impl: NewsRepositoryImpl
+    ): NewsRepository
+
     companion object {
+
+        private const val API_HEADER = "Authorization"
 
         @Provides
         @Singleton
@@ -49,6 +61,16 @@ interface DataModule {
                 .readTimeout(60, TimeUnit.SECONDS)
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
+                .addInterceptor { chain ->
+                    chain.proceed(
+                        chain
+                            .request()
+                            .newBuilder()
+                            .addHeader(
+                                API_HEADER, BuildConfig.API_KEY)
+                            .build()
+                    )
+                }
                 .build()
 
         }

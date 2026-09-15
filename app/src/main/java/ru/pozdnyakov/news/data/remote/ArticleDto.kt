@@ -5,11 +5,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Article(
+data class ArticleDto(
     @SerialName("content")
     val content: String = "",
     @SerialName("description")
-    val description: String? = "",
+    val description: String,
     @SerialName("publishedAt")
     val publishedAt: String = "",
     @SerialName("source")
