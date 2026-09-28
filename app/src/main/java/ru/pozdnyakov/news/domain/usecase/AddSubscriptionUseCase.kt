@@ -1,13 +1,18 @@
 package ru.pozdnyakov.news.domain.usecase
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import ru.pozdnyakov.news.domain.repository.NewsRepository
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 class AddSubscriptionUseCase @Inject constructor(
     private val repository: NewsRepository
 ) {
     suspend operator fun invoke(topic: String) {
         repository.addSubscription(topic)
-        repository.updateArticlesForTopic(topic)
+        CoroutineScope(coroutineContext).launch {
+            repository.updateArticlesForTopic(topic)
+        }
     }
 }
