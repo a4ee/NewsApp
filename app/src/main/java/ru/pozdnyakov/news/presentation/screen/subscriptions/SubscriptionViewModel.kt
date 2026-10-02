@@ -1,5 +1,10 @@
 package ru.pozdnyakov.news.presentation.screen.subscriptions
 
+import android.content.Context
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -85,6 +90,7 @@ class SubscriptionViewModel @Inject constructor(
                     previousState.copy(subscriptions = subscriptions)
                 }
             }
+
         }
     }
     private fun observeSelectedTopics() {
