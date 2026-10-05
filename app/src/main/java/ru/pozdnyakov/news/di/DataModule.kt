@@ -2,6 +2,7 @@ package ru.pozdnyakov.news.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.work.WorkManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -37,6 +38,12 @@ interface DataModule {
     companion object {
 
         private const val API_HEADER = "Authorization"
+
+        @Provides
+        @Singleton
+        fun provideWorkManager(
+            @ApplicationContext context: Context
+        ): WorkManager = WorkManager.getInstance(context)
 
         @Provides
         @Singleton
