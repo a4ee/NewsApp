@@ -4,6 +4,7 @@ import ru.pozdnyakov.news.data.local.ArticleDbModel
 import ru.pozdnyakov.news.data.remote.ArticleDto
 import ru.pozdnyakov.news.data.remote.NewsResponseDto
 import ru.pozdnyakov.news.domain.entity.Article
+import ru.pozdnyakov.news.domain.entity.Interval
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -20,6 +21,10 @@ fun NewsResponseDto.toDbModel(topic: String): List<ArticleDbModel> {
 
         )
     }
+}
+
+fun Int.toInterval(): Interval {
+    return Interval.entries.first{ it.minutes == this}
 }
 
 fun List<ArticleDbModel>.toEntities(): List<Article> {

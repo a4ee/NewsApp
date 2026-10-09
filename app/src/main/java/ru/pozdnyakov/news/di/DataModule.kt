@@ -21,13 +21,22 @@ import ru.pozdnyakov.news.data.local.NewsDao
 import ru.pozdnyakov.news.data.local.NewsDb
 import ru.pozdnyakov.news.data.remote.NewsApiService
 import ru.pozdnyakov.news.data.repository.NewsRepositoryImpl
+import ru.pozdnyakov.news.data.repository.SettingsRepositoryImpl
 import ru.pozdnyakov.news.domain.repository.NewsRepository
+import ru.pozdnyakov.news.domain.repository.SettingsRepository
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 interface DataModule {
+
+
+    @Binds
+    @Singleton
+    fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
 
     @Binds
     @Singleton
