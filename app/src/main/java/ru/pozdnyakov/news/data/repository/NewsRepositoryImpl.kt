@@ -1,14 +1,21 @@
 package ru.pozdnyakov.news.data.repository
 
 import android.util.Log
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.pozdnyakov.news.data.background.RefreshDataWorker
 import ru.pozdnyakov.news.data.local.ArticleDbModel
@@ -16,20 +23,30 @@ import ru.pozdnyakov.news.data.local.NewsDao
 import ru.pozdnyakov.news.data.local.SubscriptionDbModel
 import ru.pozdnyakov.news.data.mapper.toDbModel
 import ru.pozdnyakov.news.data.mapper.toEntities
+import ru.pozdnyakov.news.data.mapper.toRefreshConfig
 import ru.pozdnyakov.news.data.remote.NewsApiService
 import ru.pozdnyakov.news.domain.entity.Article
+import ru.pozdnyakov.news.domain.entity.RefreshConfig
 import ru.pozdnyakov.news.domain.repository.NewsRepository
+import ru.pozdnyakov.news.domain.repository.SettingsRepository
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class NewsRepositoryImpl @Inject constructor(
     private val newsDao: NewsDao,
     private val newsApiService: NewsApiService,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val settingsRepository: SettingsRepository
 ) : NewsRepository {
 
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     init {
-        startBackgrounRefresh()
+        settingsRepository.getSettings()
+            .map { it.toRefreshConfig() }
+            .distinctUntilChanged()
+            .onEach { startBackgrounRefresh(it) }
+            .launchIn(scope)
     }
 
     override fun getAllSubscriptions(): Flow<List<String>> {
@@ -81,10 +98,21 @@ class NewsRepositoryImpl @Inject constructor(
         return newsDao.getAllArticlesByTopics(topics).map { it.toEntities() }
     }
 
-    private fun startBackgrounRefresh() {
+    private fun startBackgrounRefresh(refreshConfig: RefreshConfig) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(
+                if (refreshConfig.wifiOnly) {
+                    NetworkType.UNMETERED
+                } else {
+                    NetworkType.CONNECTED
+                }
+            )
+            .setRequiresBatteryNotLow(true)
+            .build()
         val request = PeriodicWorkRequestBuilder<RefreshDataWorker>(
-            15L, TimeUnit.MINUTES
-        ).build()
+            refreshConfig.interval.minutes.toLong(), TimeUnit.MINUTES
+        ).setConstraints(constraints)
+            .build()
         workManager.enqueueUniquePeriodicWork(
             uniqueWorkName = "Refresh data",
             existingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,

@@ -23,7 +23,7 @@ import javax.inject.Inject
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class SettingsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ): SettingsRepository {
 
     private val languageKey = stringPreferencesKey("language")
