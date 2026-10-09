@@ -78,7 +78,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
-    ksp(libs.androidx.hilt.compilerи)
+    ksp(libs.androidx.hilt.compiler)
     implementation(libs.converter.kotlinx.serialization)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
