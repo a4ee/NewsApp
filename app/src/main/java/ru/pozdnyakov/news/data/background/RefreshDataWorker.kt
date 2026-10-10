@@ -11,12 +11,14 @@ import ru.pozdnyakov.news.domain.usecase.AddSubscriptionUseCase
 class RefreshDataWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParameters: WorkerParameters,
-    private val updateSubscribedArticlesUseCase: AddSubscriptionUseCase
+    private val updateSubscribedArticlesUseCase: AddSubscriptionUseCase,
+    private val notificationHelper: NotificationHelper
 ): CoroutineWorker(context, workerParameters) {
     override suspend fun doWork(): Result {
         Log.d("RefreshDataWorker", "Start")
         updateSubscribedArticlesUseCase
         Log.d("RefreshDataWorker", "Finished")
+        notificationHelper.showNewArticlesNotifications(listOf())
         return Result.success()
     }
 

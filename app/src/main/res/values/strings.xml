@@ -15,4 +15,7 @@
     <string name="read">Read</string>
     <string name="share">Share</string>
     <string name="no_articles_for_selected_subscriptions">No articles for selected subscriptions</string>
+    <string name="new_articles">New articles</string>
+    <string name="new_articles_notification_title">New Articles</string>
+    <string name="update_subscriptions">Update %1$d subscriptions: %2$s</string>
 </resources>

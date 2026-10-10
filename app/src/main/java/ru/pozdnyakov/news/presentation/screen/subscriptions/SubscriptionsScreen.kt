@@ -63,7 +63,7 @@ import ru.pozdnyakov.news.presentation.utils.formatDate
 
 @Composable
 fun SubscriptionScreen(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onNavigateToSettings: () -> Unit,
     viewModel: SubscriptionViewModel = hiltViewModel()
 ) {
