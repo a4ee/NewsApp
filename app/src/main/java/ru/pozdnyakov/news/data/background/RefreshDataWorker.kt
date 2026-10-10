@@ -6,19 +6,26 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 import ru.pozdnyakov.news.domain.usecase.AddSubscriptionUseCase
+import ru.pozdnyakov.news.domain.usecase.GetSettingsUseCase
+import ru.pozdnyakov.news.domain.usecase.UpdateSubscribedArticlesUseCase
 
 class RefreshDataWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParameters: WorkerParameters,
-    private val updateSubscribedArticlesUseCase: AddSubscriptionUseCase,
+    private val updateSubscribedArticlesUseCase: UpdateSubscribedArticlesUseCase,
+    private val getSettingsUseCase: GetSettingsUseCase,
     private val notificationHelper: NotificationHelper
 ): CoroutineWorker(context, workerParameters) {
     override suspend fun doWork(): Result {
         Log.d("RefreshDataWorker", "Start")
-        updateSubscribedArticlesUseCase
+        val settings = getSettingsUseCase().first()
+        val updatedTopics = updateSubscribedArticlesUseCase()
+        if (updatedTopics.isNotEmpty() &&  settings.notificationsEnabled) {
+            notificationHelper.showNewArticlesNotifications(updatedTopics)
+        }
         Log.d("RefreshDataWorker", "Finished")
-        notificationHelper.showNewArticlesNotifications(listOf())
         return Result.success()
     }
 

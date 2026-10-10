@@ -5,6 +5,7 @@ import ru.pozdnyakov.news.data.remote.ArticleDto
 import ru.pozdnyakov.news.data.remote.NewsResponseDto
 import ru.pozdnyakov.news.domain.entity.Article
 import ru.pozdnyakov.news.domain.entity.Interval
+import ru.pozdnyakov.news.domain.entity.Language
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -20,6 +21,15 @@ fun NewsResponseDto.toDbModel(topic: String): List<ArticleDbModel> {
             publishedAt = it.publishedAt.toTimestamp()
 
         )
+    }
+}
+
+fun Language.toQueryParam(): String {
+    return when(this) {
+        Language.ENGLISH -> "en"
+        Language.RUSSIAN -> "ru"
+        Language.FRENCH -> "fr"
+        Language.GERMAN -> "de"
     }
 }
 
